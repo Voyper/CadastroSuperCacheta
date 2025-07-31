@@ -1,0 +1,8 @@
+flask
+flask-wtf
+werkzeug
+requests
+
+gunicorn
+
+

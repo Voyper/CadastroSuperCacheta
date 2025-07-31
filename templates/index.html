@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <!-- Apenas uma viewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SuperCacheta – Cadastro</title>
+
+  <!-- Seu CSS principal -->
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" />
+  <!-- Font Awesome, se for usar ícones -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+</head>
+<body>
+  <div class="background-elements">
+    <div class="card-element"></div>
+    <div class="card-element"></div>
+    <div class="card-element"></div>
+    <div class="card-element"></div>
+    <div class="coin-element"></div>
+    <div class="coin-element"></div>
+    <div class="coin-element"></div>
+    <div class="coin-element"></div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="logo-section">
+        <img class="logo-image" src="{{ url_for('static', filename='header-login.webp') }}" alt="Super Cacheta" />
+      </div>
+    </div>
+
+    {% if etapa == "cadastro" %}
+    <form id="cadastroForm" method="POST" action="/cadastro">
+      <p class="subtitle">Informe os dados abaixo para cadastro:</p>
+      <div class="form-group">
+        <input class="field-login" name="username" placeholder="Apelido / Login" required type="text" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <input class="field-cpf" name="cpf" placeholder="CPF" required type="text" />
+        </div>
+        <div class="form-group">
+          <input class="field-contact" name="telefone" placeholder="Contato / Whatsapp" required type="text" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <input class="field-password" name="senha" placeholder="Senha" required type="password" />
+          <div class="password-requirements">
+            Deve conter no mínimo 6 dígitos. Deve conter no máximo 12 dígitos. Deve conter no mínimo um número.
+          </div>
+        </div>
+        <div class="form-group">
+          <input class="field-confirm" name="confirmarSenha" placeholder="Confirmar Senha" required type="password" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>ID do agente</label>
+        <input class="field-agent" name="agente_id" placeholder="9999999" type="text" />
+      </div>
+      <div class="checkbox-group">
+        <input id="terms" name="aceite_termos" required type="checkbox" />
+        <label for="terms">Certifico que tenho mais de 18 anos e li e aceitei os Termos e Políticas de Privacidade</label>
+      </div>
+      <button class="submit-btn" type="submit">Confirmar</button>
+    </form>
+    {% endif %}
+
+    {% if etapa == "verificacao" %}
+    <div id="verificacaoContainer">
+      <h2 style="color: white;">Validar conta</h2>
+      <p style="color: white;">Como você deseja receber o código de validação?</p>
+      <form method="POST" action="/enviar-codigo">
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="metodo_envio" value="sms" checked />
+            <span>Sms</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="metodo_envio" value="whatsapp" />
+            <span>Whatsapp</span>
+          </label>
+        </div>
+        <button class="submit-btn" type="submit">Enviar</button>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if etapa == "codigo" %}
+    <div id="codigoContainer">
+      <h2 style="color: white;">Validar Conta</h2>
+      <p style="color: white;">Digite o código de 6 dígitos que enviamos</p>
+      <form id="codigoForm" method="POST" action="/validar-codigo">
+        <div class="code-inputs">
+          <input type="text" maxlength="1" class="code-digit" />
+          <input type="text" maxlength="1" class="code-digit" />
+          <input type="text" maxlength="1" class="code-digit" />
+          <input type="text" maxlength="1" class="code-digit" />
+          <input type="text" maxlength="1" class="code-digit" />
+          <input type="text" maxlength="1" class="code-digit" />
+        </div>
+        <input type="hidden" id="codigoCompleto" name="codigo" />
+        <button class="submit-btn" type="submit">Continuar</button>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if etapa == "sucesso" %}
+    <div id="sucessoContainer" style="text-align: center; padding: 30px 20px;">
+      <div style="display: inline-flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 50px; margin-top: -10px;">
+        <h2 style="color: #00ff9f; font-size: 24px; margin-bottom: 20px;">
+          Conta ativada com sucesso!
+        </h2>
+
+      </div>
+
+      <p style="color: #ccc; font-size: 16px; margin-bottom: 20px;">
+        Agora é só baixar o SuperCacheta e começar a jogar:
+      </p>
+
+
+      <style>
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.6);
+        }
+        70% {
+          transform: scale(1.03);
+          box-shadow: 0 0 0 10px rgba(255, 255, 0, 0);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(255, 255, 0, 0);
+        }
+      }
+
+      .pulsante {
+        animation: pulse 1.8s infinite;
+      }
+      </style>
+
+      <a
+        href="https://play.google.com/store/apps/details?id=com.supercacheta.game"
+        target="_blank"
+        class="pulsante btn-playstore"
+      >
+        <img
+          src="{{ url_for('static', filename='playstore-icon.png') }}"
+          alt="Play Store"
+          style="height:28px;"
+        />
+        Baixe o SuperCacheta na PlayStore
+      </a>
+
+      <div style="margin-top: 40px; text-align: center; color: #888; font-size: 14px; line-height: 1.6; border-top: 1px solid #444; padding-top: 20px;">
+        <p style="margin: 8px 0;">© 2025 SuperCacheta</p>
+
+        <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <img src="{{ url_for('static', filename='numero-18.png') }}" alt="+18" style="height: 25px;">
+          <span>Proibido para menores de 18 anos</span>
+        </div>
+      </div>
+
+
+    {% endif %}
+
+
+  <script>
+    const inputs = document.querySelectorAll('.code-digit');
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', () => {
+        input.value = input.value.replace(/\D/g, '');
+        if (input.value && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+
+    const formCodigo = document.getElementById('codigoForm');
+    if (formCodigo) {
+      formCodigo.addEventListener('submit', function (e) {
+        const codigo = Array.from(inputs).map(input => input.value).join('');
+        document.getElementById('codigoCompleto').value = codigo;
+        if (codigo.length < 6) {
+          e.preventDefault();
+          alert('Digite todos os 6 dígitos do código.');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
