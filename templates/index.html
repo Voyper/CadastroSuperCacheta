@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <!-- Apenas uma viewport -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SuperCacheta – Cadastro</title>
 
@@ -13,26 +12,29 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   />
+
+  <!-- Facebook Pixel base -->
+  <script>
+    !function(f,b,e,v,n,t,s){
+      if(f.fbq)return; n=f.fbq=function(){
+        n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)
+      };
+      if(!f._fbq) f._fbq=n;
+      n.push = n; n.loaded=!0; n.version='2.0';
+      n.queue=[];
+      t=b.createElement(e); t.async=!0;
+      t.src=v;
+      s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)
+    }(
+      window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js'
+    );
+    fbq('init','1274443696949427');  // seu Pixel ID
+    fbq('track','PageView');
+  </script>
 </head>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const cadastroForm = document.getElementById('cadastroForm');
-  if (!cadastroForm) return;
-
-  cadastroForm.addEventListener('submit', function(e) {
-    const senha      = document.querySelector('.field-password').value;
-    const confirmar  = document.querySelector('.field-confirm').value;
-
-    if (senha !== confirmar) {
-      e.preventDefault();                  // cancela o submit
-      alert('❌ As senhas não coincidem.');  // ou exiba mensagem de erro no DOM
-      document.querySelector('.field-confirm').focus();
-    }
-  });
-});
-</script>
-
 
 <body>
   <div class="background-elements">
@@ -145,39 +147,26 @@ document.addEventListener('DOMContentLoaded', function() {
         <h2 style="color: #00ff9f; font-size: 24px; margin-bottom: 20px;">
           Conta ativada com sucesso!
         </h2>
-
       </div>
 
       <p style="color: #ccc; font-size: 16px; margin-bottom: 20px;">
         Agora é só baixar o SuperCacheta e começar a jogar:
       </p>
 
-
       <style>
-      @keyframes pulse {
-        0% {
-          transform: scale(1);
-          box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.6);
+        @keyframes pulse {
+          0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,0,0.6); }
+          70% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(255,255,0,0); }
+          100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,0,0); }
         }
-        70% {
-          transform: scale(1.03);
-          box-shadow: 0 0 0 10px rgba(255, 255, 0, 0);
-        }
-        100% {
-          transform: scale(1);
-          box-shadow: 0 0 0 0 rgba(255, 255, 0, 0);
-        }
-      }
-
-      .pulsante {
-        animation: pulse 1.8s infinite;
-      }
+        .pulsante { animation: pulse 1.8s infinite; }
       </style>
 
       <a
         href="https://play.google.com/store/apps/details?id=com.supercacheta.game"
         target="_blank"
         class="pulsante btn-playstore"
+        onclick="fbq('trackCustom','AppDownload',{platform:'PlayStore'});"
       >
         <img
           src="{{ url_for('static', filename='playstore-icon.png') }}"
@@ -196,84 +185,75 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
 
-
     {% endif %}
-
+  </div>
 
   <script>
-    const inputs = document.querySelectorAll('.code-digit');
-    inputs.forEach((input, index) => {
-      input.addEventListener('input', () => {
-        input.value = input.value.replace(/\D/g, '');
-        if (input.value && index < inputs.length - 1) {
-          inputs[index + 1].focus();
-        }
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1) Inputs do código de 6 dígitos
+      const inputs = document.querySelectorAll('.code-digit');
+      inputs.forEach((input, i) => {
+        input.addEventListener('input', () => {
+          input.value = input.value.replace(/\D/g, '');
+          if (input.value && i < inputs.length - 1) {
+            inputs[i + 1].focus();
+          }
+        });
+        input.addEventListener('keydown', e => {
+          if (e.key === 'Backspace' && !input.value && i > 0) {
+            inputs[i - 1].focus();
+          }
+        });
       });
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && !input.value && index > 0) {
-          inputs[index - 1].focus();
-        }
-      });
+      const formCodigo = document.getElementById('codigoForm');
+      if (formCodigo) {
+        formCodigo.addEventListener('submit', e => {
+          const codigo = Array.from(inputs).map(el => el.value).join('');
+          document.getElementById('codigoCompleto').value = codigo;
+          if (codigo.length < 6) {
+            e.preventDefault();
+            alert('Digite todos os 6 dígitos do código.');
+            return;
+          }
+          // Evento de validação completa
+          fbq('track','CompleteRegistration');
+        });
+      }
+
+      // 2) Máscaras de CPF e telefone
+      function maskCPF(e) {
+        let raw = e.target.value.replace(/\D/g, '').slice(0, 11);
+        e.target.value = raw
+          .replace(/(\d{3})(\d)/, '$1.$2')
+          .replace(/(\d{3})(\d)/, '$1.$2')
+          .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      }
+      function maskPhone(e) {
+        let raw = e.target.value.replace(/\D/g, '').slice(0, 11);
+        let v = raw.length <= 10
+          ? raw.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2')
+          : raw.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2');
+        e.target.value = v;
+      }
+      document.querySelector('.field-cpf')?.addEventListener('input', maskCPF);
+      document.querySelector('.field-contact')?.addEventListener('input', maskPhone);
+
+      // 3) Validação de senha + disparo do Pixel Lead
+      const cadastroForm = document.getElementById('cadastroForm');
+      if (cadastroForm) {
+        cadastroForm.addEventListener('submit', e => {
+          const senha = document.querySelector('.field-password').value;
+          const confirmar = document.querySelector('.field-confirm').value;
+          if (senha !== confirmar) {
+            e.preventDefault();
+            alert('❌ As senhas não coincidem.');
+            document.querySelector('.field-confirm').focus();
+            return;
+          }
+          fbq('track','Lead');
+        });
+      }
     });
-
-    const formCodigo = document.getElementById('codigoForm');
-    if (formCodigo) {
-      formCodigo.addEventListener('submit', function (e) {
-        const codigo = Array.from(inputs).map(input => input.value).join('');
-        document.getElementById('codigoCompleto').value = codigo;
-        if (codigo.length < 6) {
-          e.preventDefault();
-          alert('Digite todos os 6 dígitos do código.');
-        }
-      });
-    }
-
-
-
-
-  // Máscara de CPF: XXX.XXX.XXX-XX (11 dígitos + pontuação)
-  function maskCPF(e) {
-    // remove não-dígitos e limita a 11 caracteres
-    let raw = e.target.value.replace(/\D/g, '').slice(0, 11);
-    // formata
-    let v = raw
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-    e.target.value = v;
-  }
-
-  // Máscara de telefone: (XX) XXXX-XXXX ou (XX) XXXXX-XXXX (até 11 dígitos no total)
-  function maskPhone(e) {
-    // remove não-dígitos e limita a 11 caracteres
-    let raw = e.target.value.replace(/\D/g, '').slice(0, 11);
-    let v = raw;
-    if (raw.length <= 10) {
-      // celular antigo ou fixo sem nono dígito
-      v = v
-        .replace(/(\d{2})(\d)/, '($1) $2')
-        .replace(/(\d{4})(\d)/, '$1-$2');
-    } else {
-      // com nono dígito
-      v = v
-        .replace(/(\d{2})(\d)/, '($1) $2')
-        .replace(/(\d{5})(\d)/, '$1-$2');
-    }
-    e.target.value = v;
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const cpfField   = document.querySelector('.field-cpf');
-    const phoneField = document.querySelector('.field-contact');
-    if (cpfField)   cpfField.addEventListener('input',  maskCPF);
-    if (phoneField) phoneField.addEventListener('input', maskPhone);
-  });
-
-
-
-</script>
-
-
   </script>
 </body>
 </html>
