@@ -12,28 +12,6 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   />
-
-  <!-- Facebook Pixel base -->
-  <script>
-    !function(f,b,e,v,n,t,s){
-      if(f.fbq)return; n=f.fbq=function(){
-        n.callMethod?
-          n.callMethod.apply(n,arguments):n.queue.push(arguments)
-      };
-      if(!f._fbq) f._fbq=n;
-      n.push = n; n.loaded=!0; n.version='2.0';
-      n.queue=[];
-      t=b.createElement(e); t.async=!0;
-      t.src=v;
-      s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)
-    }(
-      window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js'
-    );
-    fbq('init','1274443696949427');  // seu Pixel ID
-    fbq('track','PageView');
-  </script>
 </head>
 
 <body>
@@ -184,13 +162,11 @@
           <span>Proibido para menores de 18 anos</span>
         </div>
       </div>
-
     {% endif %}
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 1) Inputs do código de 6 dígitos
       const inputs = document.querySelectorAll('.code-digit');
       inputs.forEach((input, i) => {
         input.addEventListener('input', () => {
@@ -205,6 +181,7 @@
           }
         });
       });
+
       const formCodigo = document.getElementById('codigoForm');
       if (formCodigo) {
         formCodigo.addEventListener('submit', e => {
@@ -215,18 +192,15 @@
             alert('Digite todos os 6 dígitos do código.');
             return;
           }
-          // Evento de validação completa
           fbq('track','CompleteRegistration');
         });
       }
 
-      // 2) Máscaras de CPF e telefone
       function maskCPF(e) {
         let raw = e.target.value.replace(/\D/g, '').slice(0, 11);
-        e.target.value = raw
-          .replace(/(\d{3})(\d)/, '$1.$2')
-          .replace(/(\d{3})(\d)/, '$1.$2')
-          .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        e.target.value = raw.replace(/(\d{3})(\d)/, '$1.$2')
+                            .replace(/(\d{3})(\d)/, '$1.$2')
+                            .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
       }
       function maskPhone(e) {
         let raw = e.target.value.replace(/\D/g, '').slice(0, 11);
@@ -238,7 +212,6 @@
       document.querySelector('.field-cpf')?.addEventListener('input', maskCPF);
       document.querySelector('.field-contact')?.addEventListener('input', maskPhone);
 
-      // 3) Validação de senha + disparo do Pixel Lead
       const cadastroForm = document.getElementById('cadastroForm');
       if (cadastroForm) {
         cadastroForm.addEventListener('submit', e => {
@@ -255,5 +228,31 @@
       }
     });
   </script>
+
+  <!-- Facebook Pixel base -->
+  <script>
+    !function(f,b,e,v,n,t,s){
+      if(f.fbq)return; n=f.fbq=function(){
+        n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)
+      };
+      if(!f._fbq) f._fbq=n;
+      n.push = n; n.loaded=!0; n.version='2.0';
+      n.queue=[];
+      t=b.createElement(e); t.async=!0;
+      t.src=v;
+      s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)
+    }(
+      window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js'
+    );
+    fbq('init','1274443696949427');
+    fbq('track','PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+         src="https://www.facebook.com/tr?id=1274443696949427&ev=PageView&noscript=1"/>
+  </noscript>
 </body>
 </html>
