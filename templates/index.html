@@ -14,6 +14,26 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   />
 </head>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const cadastroForm = document.getElementById('cadastroForm');
+  if (!cadastroForm) return;
+
+  cadastroForm.addEventListener('submit', function(e) {
+    const senha      = document.querySelector('.field-password').value;
+    const confirmar  = document.querySelector('.field-confirm').value;
+
+    if (senha !== confirmar) {
+      e.preventDefault();                  // cancela o submit
+      alert('❌ As senhas não coincidem.');  // ou exiba mensagem de erro no DOM
+      document.querySelector('.field-confirm').focus();
+    }
+  });
+});
+</script>
+
+
 <body>
   <div class="background-elements">
     <div class="card-element"></div>
@@ -61,7 +81,7 @@
         <div class="form-group">
           <input class="field-password" name="senha" placeholder="Senha" required type="password" />
           <div class="password-requirements">
-            Deve conter no mínimo 6 dígitos. Deve conter no máximo 12 dígitos. Deve conter no mínimo um número.
+            Deve conter no mínimo 6 dígitos. Deve conter no máximo 12 dígitos.
           </div>
         </div>
         <div class="form-group">
@@ -207,6 +227,53 @@
         }
       });
     }
+
+
+
+
+  // Máscara de CPF: XXX.XXX.XXX-XX (11 dígitos + pontuação)
+  function maskCPF(e) {
+    // remove não-dígitos e limita a 11 caracteres
+    let raw = e.target.value.replace(/\D/g, '').slice(0, 11);
+    // formata
+    let v = raw
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    e.target.value = v;
+  }
+
+  // Máscara de telefone: (XX) XXXX-XXXX ou (XX) XXXXX-XXXX (até 11 dígitos no total)
+  function maskPhone(e) {
+    // remove não-dígitos e limita a 11 caracteres
+    let raw = e.target.value.replace(/\D/g, '').slice(0, 11);
+    let v = raw;
+    if (raw.length <= 10) {
+      // celular antigo ou fixo sem nono dígito
+      v = v
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{4})(\d)/, '$1-$2');
+    } else {
+      // com nono dígito
+      v = v
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{5})(\d)/, '$1-$2');
+    }
+    e.target.value = v;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const cpfField   = document.querySelector('.field-cpf');
+    const phoneField = document.querySelector('.field-contact');
+    if (cpfField)   cpfField.addEventListener('input',  maskCPF);
+    if (phoneField) phoneField.addEventListener('input', maskPhone);
+  });
+
+
+
+</script>
+
+
   </script>
 </body>
 </html>
